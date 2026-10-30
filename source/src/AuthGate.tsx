@@ -123,7 +123,7 @@ export default function AuthGate() {
         const remoteData = validateBackup(remoteRow.data)
         const remoteTime = Date.parse(remoteData.updatedAt || remoteRow.updated_at || '')
         const localTime = Date.parse(localData.updatedAt || '')
-        const hasContent = (value: AppData) => value.goals.length > 0 || value.notes.length > 0 || Object.keys(value.completions).length > 0 || value.checkins.length > 0 || value.weightHistory.length > 0 || value.achievements.length > 0 || value.incidents.length > 0 || Boolean(value.settings.displayName)
+        const hasContent = (value: AppData) => value.tasks.length > 0 || value.goals.length > 0 || value.notes.length > 0 || Object.keys(value.completions).length > 0 || value.checkins.length > 0 || value.weightHistory.length > 0 || value.achievements.length > 0 || value.incidents.length > 0 || Boolean(value.settings.displayName)
         const localHasContent = hasContent(localData)
         const remoteHasContent = hasContent(remoteData)
         chosen = localHasContent && !remoteHasContent ? localData : !localHasContent && remoteHasContent ? remoteData : localExists && localTime > remoteTime ? localData : remoteData
