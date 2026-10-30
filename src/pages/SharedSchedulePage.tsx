@@ -11,7 +11,6 @@ type Props = { onImportMany: (payloads: unknown[]) => void }
 const pad = (n:number) => String(n).padStart(2,'0')
 const dateKey = (d:Date) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`
 const fromDateKey = (s:string) => { const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d,12) }
-const localDateTime = (d:Date) => `${dateKey(d)}T${pad(d.getHours())}:${pad(d.getMinutes())}`
 const endTime = (d:Date) => { const n = new Date(d.getTime()+30*60000); return `${pad(n.getHours())}:${pad(n.getMinutes())}` }
 const kindLabel = (k:Entry['kind']) => k === 'meal' ? 'وجبة' : k === 'appointment' ? 'موعد' : 'مهمة'
 
