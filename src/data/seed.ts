@@ -23,7 +23,7 @@ export function createSeedData(): AppData {
     task('sun_study_algebra',0,'19:30','21:00','مذاكرة الجبر الخطي','study',{fixed:false}),
     task('sun_review',0,'21:00','21:30','مراجعة أسبوعية','personal',{fixed:false}),
     task('sun_personal',0,'21:30','23:59','وقت شخصي','personal',{fixed:false}),
-    task('sun_sleep',0,'23:59','23:59','النوم','sleep'),
+    task('sun_sleep',0,'23:59','00:00','النوم','sleep'),
     // الاثنين: دوام 9 صباحًا–7 مساءً مع المحاضرات الأونلاين أثناء العمل
     task('mon_wake',1,'08:30','09:00','الاستيقاظ والتجهيز','personal',{fixed:false}),
     task('mon_work',1,'09:00','19:00','العمل','work'),
