@@ -52,6 +52,7 @@ export function validateBackup(value: unknown): AppData {
       displayName: typeof settings.displayName === 'string' ? settings.displayName.slice(0, 80) : '',
       streakTarget: Math.min(100, Math.max(1, Number(settings.streakTarget) || 70)),
       theme: settings.theme === 'dark' ? 'dark' : 'light',
+      nutritionGoal: settings.nutritionGoal === 'fast' ? 'fast' : 'balanced',
     },
     createdAt: typeof data.createdAt === 'string' ? data.createdAt : now,
     updatedAt: now,

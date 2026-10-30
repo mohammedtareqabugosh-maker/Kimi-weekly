@@ -70,6 +70,7 @@ export interface Settings {
   displayName: string
   streakTarget: number
   theme: 'light' | 'dark'
+  nutritionGoal: 'balanced' | 'fast'
 }
 
 export interface WeightRecord { id: string; date: string; weight: number }

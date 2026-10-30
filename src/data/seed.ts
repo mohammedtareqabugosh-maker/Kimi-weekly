@@ -125,7 +125,7 @@ export function createSeedData(): AppData {
       { id: 'goal_reading', name: 'القراءة', description: 'هدف أسبوعي قابل للتعديل', target: 5, current: 0, unit: 'جلسة', status: 'active', createdAt: now },
     ],
     notes: [], completions: {}, checkins: [], weightHistory: [], achievements: [], incidents: [],
-    settings: { displayName: '', streakTarget: 70, theme: 'light' },
+    settings: { displayName: '', streakTarget: 70, theme: 'light', nutritionGoal: 'balanced' },
     createdAt: now, updatedAt: now,
   }
 }

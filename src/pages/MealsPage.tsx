@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { Check, Download, ExternalLink, FileJson, Link2Off, Plus, Upload, Utensils } from 'lucide-react'
-import type { Task } from '../types'
+import type { Settings, Task } from '../types'
 import { DAYS } from '../types'
 import { formatTime, isCompleted, sortTasks } from '../lib/time'
 import { DayStrip } from '../components/DayStrip'
@@ -9,6 +9,8 @@ import { exportMeal } from '../lib/meals'
 
 interface MealsPageProps {
   tasks: Task[]
+  settings: Settings
+  onSettings: (settings: Settings) => void
   selectedDay: number
   selectedDate: Date
   completions: Record<string, boolean>
@@ -19,7 +21,7 @@ interface MealsPageProps {
   onUnlink: (task: Task) => void
 }
 
-export function MealsPage({ tasks, selectedDay, selectedDate, completions, onSelectDay, onAdd, onToggle, onImport, onUnlink }: MealsPageProps) {
+export function MealsPage({ tasks, settings, onSettings, selectedDay, selectedDate, completions, onSelectDay, onAdd, onToggle, onImport, onUnlink }: MealsPageProps) {
   const [showImport, setShowImport] = useState(false)
   const [json, setJson] = useState('')
   const [message, setMessage] = useState('')
@@ -35,6 +37,7 @@ export function MealsPage({ tasks, selectedDay, selectedDate, completions, onSel
   return <div className="page-stack">
     <section className="page-heading"><div><span className="section-kicker">الموعد هنا، والتفاصيل من مصدرها</span><h1>الوجبات</h1><p>استورد وجبات «مساعدي الغذائي» بصيغة JSON. المعرّف الثابت يمنع التكرار ويحدّث البيانات المرتبطة.</p></div><div className="heading-actions"><button type="button" className="secondary-button" onClick={() => setShowImport(!showImport)}><Upload size={18} /> استيراد وجبة</button><button type="button" className="primary-button" onClick={onAdd}><Plus size={19} /> وجبة غير مرتبطة</button></div></section>
     {showImport && <section className="import-panel"><div className="section-heading compact"><div><h2>استيراد من مساعدي الغذائي</h2><p>الصق JSON أو اختر ملفًا. الحقول الأساسية: id، name، day، start، end.</p></div><button type="button" className="secondary-button" onClick={() => fileRef.current?.click()}><FileJson size={18} /> اختيار ملف</button></div><input ref={fileRef} className="visually-hidden" type="file" accept="application/json,.json" onChange={async (event) => { const file = event.target.files?.[0]; if (!file) return; try { runImport(JSON.parse(await file.text())) } catch { setMessage('ملف JSON غير صالح.') } event.target.value = '' }} /><textarea className="field code-field" dir="ltr" rows={5} value={json} onChange={(event) => setJson(event.target.value)} placeholder='{"id":"meal-001","name":"الغداء","day":0,"start":"13:00","end":"13:30","source":"مساعدي الغذائي"}' /><div className="form-actions"><button type="button" className="primary-button" onClick={() => { try { runImport(JSON.parse(json)) } catch { setMessage('صيغة JSON غير صحيحة. راجع الفواصل وعلامات الاقتباس.') } }} disabled={!json.trim()}>تحقق واستورد</button><button type="button" className="text-action" onClick={() => { setShowImport(false); setMessage('') }}>إغلاق</button></div>{message && <p className="form-message" role="status">{message}</p>}</section>}
+    <section className="content-section"><div className="section-heading"><div><h2>أهداف التغذية اليومية</h2><p>اختر الهدف الذي يناسبك؛ هذه أهداف متابعة وليست بديلًا عن نصيحة مختص.</p></div></div><div className="segmented-control"><button type="button" className={settings.nutritionGoal === 'balanced' ? 'active' : ''} onClick={() => onSettings({ ...settings, nutritionGoal: 'balanced' })}>متوازن</button><button type="button" className={settings.nutritionGoal === 'fast' ? 'active' : ''} onClick={() => onSettings({ ...settings, nutritionGoal: 'fast' })}>نزول أسرع</button></div><div className="secondary-stats" style={{marginTop:14}}><article><Utensils size={20}/><div><strong>{settings.nutritionGoal === 'balanced' ? '1900–2000' : '1700–1850'} سعرة</strong><span>السعرات المستهدفة</span></div></article><article><Utensils size={20}/><div><strong>135–150 غ</strong><span>البروتين المستهدف</span></div></article><article><Utensils size={20}/><div><strong>2–3 لتر</strong><span>الماء اليومي</span></div></article></div><p className="micro-note">{settings.nutritionGoal === 'balanced' ? 'الهدف المتوازن: نزول تدريجي مع مرونة أكبر.' : 'الهدف الأسرع: قد يزيد الجوع أو التعب؛ إذا شعرت بإرهاق ارفع الهدف واستشر مختصًا.'}</p></section>
     <CloudMealsPanel selectedDate={selectedDate} onImport={onImport} />
     <section className="content-section"><div className="section-heading"><div><h2>بدائل الوجبات</h2><p>المحتوى الغذائي يأتي من الوجبة التي تسجلها في مساعدي الغذائي، وليس من وصف افتراضي.</p></div></div><div className="secondary-stats">{['الإفطار','الوجبة الخفيفة','الغداء','العشاء'].map((name) => <article key={name}><Utensils size={20}/><div><strong>{name}</strong><span>أضف البديل في مساعدي الغذائي ثم اربطه بالجدول</span></div></article>)}</div></section>
     <DayStrip selectedDay={selectedDay} onSelect={onSelectDay} today={new Date()} />
