@@ -33,6 +33,7 @@ export function validateBackup(value: unknown): AppData {
   const settings = data.settings as AppData['settings']
   return {
     schemaVersion: Number(data.schemaVersion) >= 4 ? 4 : Number(data.schemaVersion) >= 3 ? 3 : Number(data.schemaVersion) >= 2 ? 2 : 1,
+    deletedTaskIds: Array.isArray(data.deletedTaskIds) ? [...new Set(data.deletedTaskIds.filter((id): id is string => typeof id === 'string' && id.length > 0))] : [],
     tasks: data.tasks.map((task: Task) => ({
       ...task,
       title: task.title.trim(),
