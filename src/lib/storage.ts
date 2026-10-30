@@ -33,7 +33,9 @@ export async function loadData(): Promise<AppData> {
       // Replace only the app's old built-in template tasks; preserve custom tasks, goals, notes and completion history.
       const legacyTemplateId = /^(sun_|wake_\d|work_\d|study_\d|commute_\d|meal_\d_(breakfast|dinner)|mon_online|tue_online)/
       const fresh = createSeedData()
-      return { ...validated, schemaVersion: 2, tasks: [...fresh.tasks, ...validated.tasks.filter((task) => !legacyTemplateId.test(task.id))] }
+      const migrated = { ...validated, schemaVersion: 2, tasks: [...fresh.tasks, ...validated.tasks.filter((task) => !legacyTemplateId.test(task.id))] }
+      await database.put(STORE_NAME, migrated, DATA_KEY)
+      return migrated
     }
     return validated
   } catch (error) {
