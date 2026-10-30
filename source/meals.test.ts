@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { createSeedData } from '../data/seed'
-import { importMeal } from './meals'
+import { createSeedData } from './src/data/seed'
+import { importMeal } from './src/lib/meals'
 
 const payload = { id: 'nutrition-meal-1', name: 'وجبة من التطبيق الغذائي', kind: 'غداء', day: 0, start: '13:30', end: '14:00', calories: 500, protein: 30, source: 'مساعدي الغذائي' }
 
