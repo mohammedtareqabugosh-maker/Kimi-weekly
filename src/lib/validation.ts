@@ -44,7 +44,7 @@ export function validateBackup(value: unknown): AppData {
     goals: data.goals.map((goal) => ({ ...goal, description: goal.description ?? '', unit: goal.unit || 'مرة', status: goal.status ?? 'active', createdAt: goal.createdAt ?? now })),
     notes: data.notes.map((note) => ({ ...note, createdAt: note.createdAt ?? now, updatedAt: note.updatedAt ?? note.createdAt ?? now })),
     completions: Object.fromEntries(Object.entries(data.completions).filter(([, complete]) => complete === true)) as Record<string, boolean>,
-    checkins: Array.isArray(data.checkins) ? data.checkins.filter((item): item is string => typeof item === 'string' && /^\\d{4}-\\d{2}-\\d{2}$/.test(item)) : [],
+    checkins: Array.isArray(data.checkins) ? data.checkins.filter((item): item is string => typeof item === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(item)) : [],
     weightHistory: Array.isArray(data.weightHistory) ? data.weightHistory.filter((item) => item && typeof item.id === 'string' && typeof item.date === 'string' && Number.isFinite(item.weight) && item.weight > 0) : [],
     achievements: Array.isArray(data.achievements) ? data.achievements.filter((item) => item && typeof item.id === 'string' && typeof item.title === 'string' && typeof item.date === 'string') : [],
     incidents: Array.isArray(data.incidents) ? data.incidents.filter((item) => item && typeof item.id === 'string' && typeof item.date === 'string' && typeof item.text === 'string') : [],
