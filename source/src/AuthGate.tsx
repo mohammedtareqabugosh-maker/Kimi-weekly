@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { AppContent } from './App'
@@ -6,7 +6,7 @@ import type { AppData } from './types'
 import { hasStoredData, loadData, saveData, setStorageUserId } from './lib/storage'
 import { validateBackup } from './lib/validation'
 import { isSupabaseConfigured, supabase } from './lib/supabase'
-import { CalendarDays, CheckCircle2, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck } from 'lucide-react'
+import { CheckCircle2, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck } from 'lucide-react'
 
 type AuthMode = 'login' | 'signup' | 'reset'
 
