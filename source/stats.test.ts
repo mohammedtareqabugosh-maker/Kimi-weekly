@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import type { Task } from '../types'
-import { calculatePeriodStats, getStreak } from './stats'
-import { createSeedData } from '../data/seed'
-import { completionKey } from './time'
+import type { Task } from './src/types'
+import { calculatePeriodStats, getStreak } from './src/lib/stats'
+import { createSeedData } from './src/data/seed'
+import { completionKey } from './src/lib/time'
 
 const task = (id: string, type: Task['type'], start: string, end: string): Task => ({ id, title: id, type, day: 1, start, end, notes: '', fixed: false, allowSplit: false, countsTowardsProgress: type !== 'rest' && type !== 'sleep' })
 
