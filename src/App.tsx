@@ -111,7 +111,16 @@ export default function App() {
     })
   }
 
-  const resetSelectedDay = () => {\n    updateData((current) => {\n      const completions = { ...current.completions }\n      for (const task of current.tasks.filter((item) => item.day === selectedDay)) delete completions[completionKey(selectedDate, task.id)]\n      return { ...current, completions, updatedAt: new Date().toISOString() }\n    })\n    setToast({ message: `أُعيد ضبط إنجازات يوم ${['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'][selectedDay]} فقط.` })\n  }\n\n  const askDeleteTask = (task: Task) => setDeleteTarget({ kind: 'task', id: task.id, title: task.title })
+  const resetSelectedDay = () => {
+    updateData((current) => {
+      const completions = { ...current.completions }
+      for (const task of current.tasks.filter((item) => item.day === selectedDay)) delete completions[completionKey(selectedDate, task.id)]
+      return { ...current, completions, updatedAt: new Date().toISOString() }
+    })
+    setToast({ message: `أُعيد ضبط إنجازات يوم ${['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'][selectedDay]} فقط.` })
+  }
+
+  const askDeleteTask = (task: Task) => setDeleteTarget({ kind: 'task', id: task.id, title: task.title })
   const confirmDelete = () => {
     if (!deleteTarget || !data) return
     const { kind, id } = deleteTarget

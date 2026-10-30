@@ -1,4 +1,6 @@
-import { useMemo, useState } from 'react'\nimport { RotateCcw } from 'lucide-react'\nimport { Modal } from '../components/Modal'
+import { useMemo, useState } from 'react'
+import { RotateCcw } from 'lucide-react'
+import { Modal } from '../components/Modal'
 import { AlertTriangle, CalendarPlus, Search } from 'lucide-react'
 import type { AppData, Task } from '../types'
 import { DAYS } from '../types'
@@ -20,7 +22,8 @@ interface SchedulePageProps {
 
 export function SchedulePage({ data, selectedDay, selectedDate, onSelectDay, onResetDay, onAdd, onEdit, onDuplicate, onDelete, onToggle }: SchedulePageProps) {
   const [search, setSearch] = useState('')
-  const [filter, setFilter] = useState<'all' | 'remaining' | 'completed'>('all')\n  const [confirmReset, setConfirmReset] = useState(false)
+  const [filter, setFilter] = useState<'all' | 'remaining' | 'completed'>('all')
+  const [confirmReset, setConfirmReset] = useState(false)
   const tasks = useMemo(() => data.tasks.filter((task) => {
     if (task.day !== selectedDay) return false
     if (search && !`${task.title} ${task.notes}`.toLowerCase().includes(search.trim().toLowerCase())) return false
@@ -38,7 +41,8 @@ export function SchedulePage({ data, selectedDay, selectedDate, onSelectDay, onR
       </section>
       <DayStrip selectedDay={selectedDay} onSelect={onSelectDay} today={new Date()} />
       {conflictCount > 0 && <div className="inline-alert"><AlertTriangle size={20} /><p>يوجد {conflictCount} تداخل في {DAYS[selectedDay]}. لم نغيّر أي مهمة تلقائيًا؛ افتح المهمة لمراجعة وقتها.</p></div>}
-      {confirmReset && <Modal title="إعادة ضبط إنجازات اليوم" onClose={() => setConfirmReset(false)}><div className="delete-confirm"><p>هل تريد إلغاء علامات الإنجاز لهذا اليوم فقط؟</p><span>لن تتغير المهام أو مواعيدها أو إنجازات الأيام الأخرى.</span><div className="modal-actions"><button type="button" className="secondary-button" onClick={() => setConfirmReset(false)}>إلغاء</button><button type="button" className="primary-button" onClick={() => { onResetDay(); setConfirmReset(false) }}>تأكيد إعادة الضبط</button></div></div></Modal>}\n      <section className="content-section">
+      {confirmReset && <Modal title="إعادة ضبط إنجازات اليوم" onClose={() => setConfirmReset(false)}><div className="delete-confirm"><p>هل تريد إلغاء علامات الإنجاز لهذا اليوم فقط؟</p><span>لن تتغير المهام أو مواعيدها أو إنجازات الأيام الأخرى.</span><div className="modal-actions"><button type="button" className="secondary-button" onClick={() => setConfirmReset(false)}>إلغاء</button><button type="button" className="primary-button" onClick={() => { onResetDay(); setConfirmReset(false) }}>تأكيد إعادة الضبط</button></div></div></Modal>}
+      <section className="content-section">
         <div className="schedule-tools">
           <label className="search-field"><Search size={19} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="ابحث في مهام هذا اليوم" aria-label="البحث في المهام" /></label>
           <div className="segmented-control" aria-label="تصفية المهام">
