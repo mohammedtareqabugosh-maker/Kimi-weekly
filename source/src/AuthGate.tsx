@@ -55,7 +55,7 @@ function AuthScreen() {
 
   return <main className="auth-page" dir="rtl">
     <section className="auth-card">
-      <div className="auth-brand-mark"><span>ن</span><i /></div>
+      <div className="auth-brand-mark"><img src="./icons/nassq.svg" alt="شعار نَسّق" /></div>
       <p className="auth-kicker">NASSQ · نَسّق</p>
       <h1>{mode === 'login' ? 'أهلًا بعودتك' : mode === 'signup' ? 'أنشئ حسابك' : 'استعادة كلمة المرور'}</h1>
       <p className="auth-subtitle">كل تفاصيل يومك، بتناغم.</p>
@@ -155,9 +155,9 @@ export default function AuthGate() {
     else { setSession(null); setUser(null); setReady(false) }
   }, [])
 
-  if (!sessionChecked) return <main className="auth-loading"><div className="auth-brand-mark"><span>ن</span></div><p>جارٍ التحقق من الجلسة…</p></main>
+  if (!sessionChecked) return <main className="auth-loading"><div className="auth-brand-mark"><img src="./icons/nassq.svg" alt="شعار نَسّق" /></div><p>جارٍ التحقق من الجلسة…</p></main>
   if (!session || !user) return <AuthScreen />
-  if (accountError) return <main className="auth-loading"><div className="auth-brand-mark"><span>ن</span></div><h1>تعذّرت مزامنة الحساب</h1><p>{accountError}</p><p>بيانات الجهاز لم تُحذف. افحص إعدادات قاعدة البيانات وسياسة الوصول ثم أعد المحاولة.</p><button className="auth-primary" onClick={()=>{setAccountError('');setReady(false);setSessionChecked(false);supabase?.auth.getSession().then(({data})=>{setSession(data.session);setUser(data.session?.user??null);setSessionChecked(true)})}}>إعادة المحاولة</button><button className="auth-text-button" onClick={signOut}>تسجيل الخروج</button></main>
-  if (!ready) return <main className="auth-loading"><div className="auth-brand-mark"><span>ن</span></div><p>جارٍ تحميل جدولك وأهدافك ومزامنة بياناتك بأمان…</p><div className="loading-line"><span /></div></main>
+  if (accountError) return <main className="auth-loading"><div className="auth-brand-mark"><img src="./icons/nassq.svg" alt="شعار نَسّق" /></div><h1>تعذّرت مزامنة الحساب</h1><p>{accountError}</p><p>بيانات الجهاز لم تُحذف. افحص إعدادات قاعدة البيانات وسياسة الوصول ثم أعد المحاولة.</p><button className="auth-primary" onClick={()=>{setAccountError('');setReady(false);setSessionChecked(false);supabase?.auth.getSession().then(({data})=>{setSession(data.session);setUser(data.session?.user??null);setSessionChecked(true)})}}>إعادة المحاولة</button><button className="auth-text-button" onClick={signOut}>تسجيل الخروج</button></main>
+  if (!ready) return <main className="auth-loading"><div className="auth-brand-mark"><img src="./icons/nassq.svg" alt="شعار نَسّق" /></div><p>جارٍ تحميل جدولك وأهدافك ومزامنة بياناتك بأمان…</p><div className="loading-line"><span /></div></main>
   return <AppContent userEmail={user.email ?? ''} onSignOut={signOut} saveCloudData={saveCloudData}/>
 }
