@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import type { FormEvent } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { AppContent } from './App'
 import type { AppData } from './types'
@@ -18,7 +19,7 @@ function AuthScreen() {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
 
-  const submit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!supabase) return
     setBusy(true); setError(''); setMessage('')
