@@ -11,11 +11,14 @@ function mergeAccountData(local: AppData, remote: AppData): AppData {
     for (const item of first) map.set(item.id, item)
     return [...map.values()]
   }
+  const deletedTaskIds = [...new Set([...(local.deletedTaskIds ?? []), ...(remote.deletedTaskIds ?? [])])]
+  const deletedTaskSet = new Set(deletedTaskIds)
   return {
     ...remote,
     ...local,
     schemaVersion: Math.max(local.schemaVersion || 1, remote.schemaVersion || 1),
-    tasks: mergeById(local.tasks, remote.tasks),
+    deletedTaskIds,
+    tasks: mergeById(local.tasks, remote.tasks).filter((task) => !deletedTaskSet.has(task.id)),
     goals: mergeById(local.goals, remote.goals),
     notes: mergeById(local.notes, remote.notes),
     completions: { ...remote.completions, ...local.completions },
