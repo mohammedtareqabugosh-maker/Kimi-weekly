@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { BarChart3, CalendarDays, CloudOff, Home, LogOut, MoreHorizontal, NotebookPen, Settings, Sparkles, Target, Utensils, Wifi, X } from 'lucide-react'
+import { BarChart3, CalendarDays, CloudDownload, CloudOff, Home, LogOut, MoreHorizontal, NotebookPen, Save, Settings, Sparkles, Target, Utensils, Wifi, X } from 'lucide-react'
 import type { AppData, Goal, Note, Settings as SettingsType, Task, View } from './types'
 import { loadData, saveData } from './lib/storage'
 import { completionKey, weekDates } from './lib/time'
@@ -35,10 +35,11 @@ function Brand({ compact = false }: { compact?: boolean }) {
   return <div className={`brand ${compact ? 'compact' : ''}`}><span className="brand-mark" aria-hidden="true"><img src="./icons/nassq.svg" alt="" /><i /></span><div><strong>نَسّق</strong>{!compact && <small>كل تفاصيل يومك، بتناغم.</small>}</div></div>
 }
 
-export function AppContent({ userEmail, onSignOut, saveCloudData }: { userEmail: string; onSignOut: () => Promise<void>; saveCloudData: (data: AppData) => Promise<void> }) {
+export function AppContent({ userEmail, onSignOut, saveCloudData, loadCloudData }: { userEmail: string; onSignOut: () => Promise<void>; saveCloudData: (data: AppData) => Promise<void>; loadCloudData: () => Promise<AppData | null> }) {
   const [data, setData] = useState<AppData | null>(null)
   const [loadError, setLoadError] = useState('')
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved')
+  const [manualSyncBusy, setManualSyncBusy] = useState(false)
   const [view, setView] = useState<View>('home')
   const [selectedDay, setSelectedDay] = useState(new Date().getDay())
   const [editor, setEditor] = useState<EditorState | null>(null)
@@ -172,6 +173,43 @@ export function AppContent({ userEmail, onSignOut, saveCloudData }: { userEmail:
     return command.reply
   }
   const updateSettings = (settings: SettingsType) => updateData((current) => ({ ...current, settings }))
+  const saveNow = async () => {
+    if (!data || manualSyncBusy) return
+    setManualSyncBusy(true)
+    setSaveStatus('saving')
+    try {
+      const snapshot = { ...data, updatedAt: new Date().toISOString() }
+      await saveData(snapshot)
+      await saveCloudData(snapshot)
+      setSaveStatus('saved')
+      setToast({ message: 'تم حفظ معلوماتك على الجهاز ومزامنتها مع حسابك بنجاح.' })
+    } catch (error) {
+      setSaveStatus('error')
+      setToast({ message: `تعذّر حفظ المعلومات: ${error instanceof Error ? error.message : 'خطأ غير معروف'}` })
+    } finally {
+      setManualSyncBusy(false)
+    }
+  }
+  const restoreFromCloud = async () => {
+    if (manualSyncBusy) return
+    if (!window.confirm('سيتم تحميل بيانات حسابك من السحابة واستبدال البيانات الحالية على هذا الجهاز. هل تريد المتابعة؟')) return
+    setManualSyncBusy(true)
+    try {
+      const remote = await loadCloudData()
+      if (!remote) {
+        setToast({ message: 'لا توجد معلومات محفوظة في حسابك السحابي حتى الآن. افتح النسخة التي تحتوي على معلوماتك واضغط «حفظ المعلومات» أولًا.' })
+        return
+      }
+      await saveData(remote)
+      setData(remote)
+      setSaveStatus('saved')
+      setToast({ message: 'تم تحميل معلومات حسابك وحفظها على هذا الجهاز.' })
+    } catch (error) {
+      setToast({ message: `تعذّر تحميل معلومات الحساب: ${error instanceof Error ? error.message : 'خطأ غير معروف'}` })
+    } finally {
+      setManualSyncBusy(false)
+    }
+  }
   const signOutSafely = async () => {
     if (data) {
       const snapshot = { ...data, updatedAt: new Date().toISOString() }
@@ -200,7 +238,7 @@ export function AppContent({ userEmail, onSignOut, saveCloudData }: { userEmail:
 
       <header className="mobile-header"><Brand compact /><span className={`network-badge ${online ? '' : 'offline'}`} title={online ? 'متصل' : 'غير متصل'}>{online ? <Wifi size={17} /> : <CloudOff size={17} />}<span>{online ? 'محلي' : 'دون اتصال'}</span></span></header>
       <main className="main-content" id="main-content">
-        <div className="account-strip"><span>الحساب: {userEmail}</span><button type="button" onClick={() => { void signOutSafely() }}><LogOut size={15}/> تسجيل الخروج</button></div>
+        <div className="account-strip"><span>الحساب: {userEmail}</span><div className="account-actions"><button type="button" onClick={() => { void saveNow() }} disabled={manualSyncBusy}><Save size={15}/>{manualSyncBusy ? "جارٍ الحفظ…" : "حفظ المعلومات"}</button><button type="button" onClick={() => { void restoreFromCloud() }} disabled={manualSyncBusy}><CloudDownload size={15}/>تحميل بيانات الحساب</button><button type="button" onClick={() => { void signOutSafely() }} disabled={manualSyncBusy}><LogOut size={15}/> تسجيل الخروج</button></div></div>
         <div className="desktop-status"><span className={`save-indicator ${saveStatus}`}><i />{saveStatus === 'saving' ? 'جارٍ الحفظ محليًا' : saveStatus === 'error' ? 'تعذر الحفظ — راجع مساحة المتصفح' : 'كل التغييرات محفوظة محليًا'}</span><span className={`network-badge ${online ? '' : 'offline'}`}>{online ? <Wifi size={16} /> : <CloudOff size={16} />}{online ? 'متصل' : 'دون اتصال'}</span></div>
         {view === 'home' && <HomePage {...shared} onNavigate={navigate} />}
         {view === 'schedule' && <SchedulePage {...shared} />}
