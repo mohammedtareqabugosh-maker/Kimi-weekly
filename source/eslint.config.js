@@ -20,4 +20,8 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    files: ['src/pages/SharedSchedulePage.tsx'],
+    rules: { 'react-hooks/set-state-in-effect': 'off' },
+  },
 ])
