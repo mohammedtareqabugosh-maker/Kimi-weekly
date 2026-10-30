@@ -80,6 +80,8 @@ export interface IncidentRecord { id: string; date: string; text: string }
 export interface AppData {
   schemaVersion: number
   tasks: Task[]
+  /** IDs of tasks explicitly deleted by the user; prevents sync from resurrecting them. */
+  deletedTaskIds?: string[]
   goals: Goal[]
   notes: Note[]
   completions: Record<string, boolean>
