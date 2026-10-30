@@ -8,7 +8,7 @@ permissions:
   pages: write
   id-token: write
 concurrency:
-  group: jadwali-weekly-deploy
+  group: jadwali-weekly-deploy-v2
   cancel-in-progress: true
 jobs:
   build:
