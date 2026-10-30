@@ -146,8 +146,8 @@ export function AppContent({ userEmail, onSignOut, saveCloudData, loadCloudData 
       const task = data.tasks.find((item) => item.id === id)
       if (task) {
         const index = data.tasks.findIndex((item) => item.id === id)
-        updateData((current) => ({ ...current, tasks: current.tasks.filter((item) => item.id !== id) }))
-        setToast({ message: `حُذفت «${task.title}».`, actionLabel: 'تراجع', action: () => { updateData((current) => { const tasks = [...current.tasks]; tasks.splice(Math.min(index, tasks.length), 0, task); return { ...current, tasks } }); setToast({ message: 'عادت المهمة إلى مكانها.' }) } })
+        updateData((current) => ({ ...current, tasks: current.tasks.filter((item) => item.id !== id), deletedTaskIds: [...new Set([...(current.deletedTaskIds ?? []), id])] }))
+        setToast({ message: `حُذفت «${task.title}».`, actionLabel: 'تراجع', action: () => { updateData((current) => { const tasks = [...current.tasks]; tasks.splice(Math.min(index, tasks.length), 0, task); return { ...current, tasks, deletedTaskIds: (current.deletedTaskIds ?? []).filter((deletedId) => deletedId !== id) } }); setToast({ message: 'عادت المهمة إلى مكانها.' }) } })
       }
     } else if (kind === 'goal') {
       updateData((current) => ({ ...current, goals: current.goals.filter((goal) => goal.id !== id), tasks: current.tasks.map((task) => task.goalId === id ? { ...task, goalId: undefined } : task) }))
