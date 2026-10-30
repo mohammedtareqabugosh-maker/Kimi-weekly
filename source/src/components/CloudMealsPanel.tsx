@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { CloudDownload, ExternalLink, LogIn, LogOut, RefreshCw, Utensils } from 'lucide-react'
 
 const SUPABASE_URL = 'https://chcapjgjvvwpljgdffpg.supabase.co'
@@ -21,7 +21,7 @@ export function CloudMealsPanel({ selectedDate, onImport }: Props) {
   const [calories, setCalories] = useState(0)
   const [protein, setProtein] = useState(0)
 
-  async function loadMeals(accessToken = token, account = user) {
+  const loadMeals = useCallback(async (accessToken = token, account = user) => {
     if (!accessToken || !account) return
     setBusy(true); setMessage('جارٍ تحميل وجبات التاريخ المحدد…')
     const start = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate())
@@ -38,7 +38,7 @@ export function CloudMealsPanel({ selectedDate, onImport }: Props) {
       setMessage(result.length ? `تم تحميل ${result.length} وجبة لهذا التاريخ.` : 'لا توجد وجبات مشتركة مسجلة لهذا التاريخ في حسابك.')
     } catch (error) { setMessage(error instanceof Error ? error.message : 'تعذر الاتصال بمساعدي الغذائي.') }
     finally { setBusy(false) }
-  }
+  }, [selectedDate, token, user])
   async function login() {
     if (!email.trim() || !password) { setMessage('أدخل البريد الإلكتروني وكلمة المرور.'); return }
     setBusy(true); setMessage('جارٍ تسجيل الدخول…')
@@ -50,7 +50,7 @@ export function CloudMealsPanel({ selectedDate, onImport }: Props) {
       await loadMeals(result.access_token, result.user)
     } catch (error) { setMessage(error instanceof Error ? error.message : 'تعذر تسجيل الدخول.'); setBusy(false) }
   }
-  useEffect(() => { if (token && user) void loadMeals(token, user) }, [selectedDate.toDateString()])
+  useEffect(() => { if (token && user) void Promise.resolve().then(() => loadMeals(token, user)) }, [loadMeals, token, user])
   function addToSchedule(meal: CloudMeal) {
     const when = new Date(meal.starts_at)
     if (Number.isNaN(when.getTime())) { setMessage('تاريخ الوجبة غير صالح.'); return }
