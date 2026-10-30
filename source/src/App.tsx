@@ -59,6 +59,20 @@ export function AppContent({ userEmail, onSignOut, saveCloudData, loadCloudData 
     return () => { active = false }
   }, [])
 
+
+  useEffect(() => {
+    const onCloudDataLoaded = (event: Event) => {
+      const detail = (event as CustomEvent<AppData>).detail
+      if (detail) {
+        setData(detail)
+        loaded.current = true
+        skipInitialSave.current = true
+      }
+    }
+    window.addEventListener('nassq:cloud-data-loaded', onCloudDataLoaded)
+    return () => window.removeEventListener('nassq:cloud-data-loaded', onCloudDataLoaded)
+  }, [])
+
   useEffect(() => {
     if (!data || !loaded.current) return
     if (skipInitialSave.current) { skipInitialSave.current = false; return }
