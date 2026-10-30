@@ -5,7 +5,7 @@ import { AppContent } from './App'
 import type { AppData } from './types'
 
 function mergeAccountData(local: AppData, remote: AppData): AppData {
-  const mergeById = <T extends { id: string }>(first: T[], second: T[]) => {
+  const mergeById = <T extends { id: string },>(first: T[], second: T[]) => {
     const map = new Map<string, T>()
     for (const item of second) map.set(item.id, item)
     for (const item of first) map.set(item.id, item)
