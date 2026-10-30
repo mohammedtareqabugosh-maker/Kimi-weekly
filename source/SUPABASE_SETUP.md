@@ -41,7 +41,10 @@ grant select, insert, update on public.user_app_data to authenticated;
 ```
 
 ## 3. تفعيل البريد وGoogle
-في Authentication → URL Configuration أضف عنوان GitHub Pages المنشور إلى Site URL / Redirect URLs.
+في Authentication → URL Configuration أضف الرابطين التاليين إلى قائمة Redirect URLs (مع المسار كاملًا):
+- `https://mohammedtareqabugosh-maker.github.io/Kimi-weekly/`
+- `https://mohammedtareqabugosh-maker.github.io/kimi-jadwali/?template=blank`
+اختر أحدهما كـ Site URL، وأبقِ الرابطين في Redirect URLs.
 في Authentication → Providers فعّل Email، ثم فعّل Google وأدخل Client ID وClient Secret اللذين تنشئهما في Google Cloud Console. أضف عنوان callback الذي يعرضه Supabase إلى إعدادات OAuth في Google Cloud. يجب إضافة عنوان كل نسخة منشورة إلى Redirect URLs في Supabase.
 
 ## 4. نشر المتغيرات
