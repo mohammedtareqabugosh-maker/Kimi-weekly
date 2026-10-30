@@ -160,43 +160,44 @@ export default function AuthGate() {
   useEffect(() => {
     if (!sessionChecked || !user || !supabase) return
     let active = true
-    let localDataLoaded = false
     ;(async () => {
-      await withTimeout(setStorageUserId(user.id), 10000, 'تأخر فتح مساحة بيانات الحساب على الجهاز.')
+      await withTimeout(setStorageUserId(user.id), 10000, 'تأخر فتح بيانات الحساب على الجهاز.')
       const localData = await withTimeout(loadData(), 10000, 'تأخر تحميل البيانات المحفوظة على الجهاز.')
-      localDataLoaded = true
-      const { data: remoteRow, error } = await withTimeout(
-        supabase!.from('user_app_data').select('data, updated_at').eq('user_id', user.id).maybeSingle(),
-        10000,
-        'انتهت مهلة مزامنة البيانات السحابية. سيُفتح التطبيق ببيانات الجهاز أولًا.',
-      )
-      if (error) throw error
-      let chosen: AppData
-      if (remoteRow?.data) {
-        const remoteData = validateBackup(remoteRow.data)
-        const hasContent = (value: AppData) => value.tasks.length > 0 || value.goals.length > 0 || value.notes.length > 0 || Object.keys(value.completions).length > 0 || value.checkins.length > 0 || value.weightHistory.length > 0 || value.achievements.length > 0 || value.incidents.length > 0 || Boolean(value.settings.displayName)
-        const localHasContent = hasContent(localData)
-        const remoteHasContent = hasContent(remoteData)
-        if (localHasContent && remoteHasContent) chosen = mergeAccountData(localData, remoteData)
-        else if (localHasContent) chosen = localData
-        else chosen = remoteData
-      } else {
-        chosen = localData
+      if (!active) return
+      setAccountError('')
+      setReady(true)
+      try {
+        const { data: remoteRow, error } = await withTimeout(
+          supabase!.from('user_app_data').select('data, updated_at').eq('user_id', user.id).maybeSingle(),
+          12000,
+          'تأخرت المزامنة السحابية. يمكنك متابعة استخدام بيانات الجهاز.'
+        )
+        if (error) throw error
+        let chosen = localData
+        if (remoteRow?.data) {
+          const remoteData = validateBackup(remoteRow.data)
+          const hasContent = (value: AppData) => value.tasks.length > 0 || value.goals.length > 0 || value.notes.length > 0 || Object.keys(value.completions).length > 0 || value.checkins.length > 0 || value.weightHistory.length > 0 || value.achievements.length > 0 || value.incidents.length > 0 || Boolean(value.settings.displayName)
+          const localHasContent = hasContent(localData)
+          const remoteHasContent = hasContent(remoteData)
+          if (localHasContent && remoteHasContent) chosen = mergeAccountData(localData, remoteData)
+          else if (!localHasContent) chosen = remoteData
+        }
+        const synchronized = { ...chosen, updatedAt: new Date().toISOString() }
+        await saveData(synchronized)
+        if (active) window.dispatchEvent(new CustomEvent('nassq:cloud-data-loaded', { detail: synchronized }))
+        void withTimeout(
+          supabase!.from('user_app_data').upsert({ user_id: user.id, data: synchronized, updated_at: synchronized.updatedAt }, { onConflict: 'user_id' }),
+          12000,
+          'تأخرت مزامنة النسخة السحابية.'
+        ).then(({ error: syncError }) => { if (syncError) throw syncError }).catch((e) => {
+          if (active) setAccountError(e instanceof Error ? e.message : 'تعذّرت مزامنة البيانات السحابية.')
+        })
+      } catch (e) {
+        if (active) setAccountError(e instanceof Error ? e.message : 'تعذّرت مزامنة البيانات السحابية.')
       }
-      const synchronized = { ...chosen, updatedAt: new Date().toISOString() }
-      await saveData(synchronized)
-      const { error: syncError } = await withTimeout(
-        supabase!.from('user_app_data').upsert({ user_id: user.id, data: synchronized, updated_at: synchronized.updatedAt }, { onConflict: 'user_id' }),
-        10000,
-        'انتهت مهلة حفظ النسخة السحابية. ستبقى بيانات الجهاز متاحة ويمكن إعادة المزامنة لاحقًا.',
-      )
-      if (syncError) throw syncError
-      if (active) { setAccountError(''); setReady(true) }
     })().catch((e) => {
       if (!active) return
-      setAccountError(e instanceof Error ? e.message : 'تعذّرت مزامنة بيانات الحساب.')
-      // Local data is still safe to use if the cloud is unavailable.
-      if (localDataLoaded) setReady(true)
+      setAccountError(e instanceof Error ? e.message : 'تعذّر فتح بيانات الحساب على الجهاز.')
     })
     return () => { active = false }
   }, [sessionChecked, user?.id])
