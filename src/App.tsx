@@ -30,8 +30,11 @@ const primaryNav: Array<{ view: View; label: string; icon: typeof Home }> = [
   { view: 'more', label: 'المزيد', icon: MoreHorizontal },
 ]
 
+const IS_BLANK_TEMPLATE = window.location.pathname.endsWith('/blank.html') || new URLSearchParams(window.location.search).get('template') === 'blank'
+
 function Brand({ compact = false }: { compact?: boolean }) {
-  return <div className={`brand ${compact ? 'compact' : ''}`}><span className="brand-mark" aria-hidden="true"><CalendarDays size={24} /><i /></span><div><strong>جدولي الأسبوعي</strong>{!compact && <small>Weekly Schedule</small>}</div></div>
+  const name = IS_BLANK_TEMPLATE ? 'رِفق' : 'جدولي الأسبوعي'
+  return <div className={`brand ${compact ? 'compact' : ''}`}><span className="brand-mark" aria-hidden="true"><CalendarDays size={24} /><i /></span><div><strong>{name}</strong>{!compact && <small>{IS_BLANK_TEMPLATE ? 'أنشئ جدولك الخاص' : 'Weekly Schedule'}</small>}</div></div>
 }
 
 export default function App() {

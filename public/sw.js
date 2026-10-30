@@ -1,5 +1,5 @@
-const CACHE = 'jadwali-shell-v5'
-const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png']
+const CACHE = 'jadwali-shell-v6'
+const SHELL = ['./', './index.html', './manifest.webmanifest', './manifest-blank.webmanifest', './blank.html', './icon-192.png', './icon-512.png', './apple-touch-icon.png']
 
 async function cacheAppShell() {
   const cache = await caches.open(CACHE)
@@ -42,7 +42,7 @@ self.addEventListener('fetch', (event) => {
 
   if (request.mode === 'navigate') {
     event.respondWith(fetch(request).then((response) => cacheResponse(request, response)).catch(async () => {
-      return (await caches.match('./index.html')) || (await caches.match('./')) || Response.error()
+      return (await caches.match(request.url.endsWith('/blank.html') ? './blank.html' : './index.html')) || (await caches.match('./index.html')) || (await caches.match('./')) || Response.error()
     }))
     return
   }

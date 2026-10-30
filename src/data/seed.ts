@@ -116,3 +116,9 @@ export function createSeedData(): AppData {
     createdAt: now, updatedAt: now,
   }
 }
+
+/** Empty starter data for people who want to build their own weekly schedule. */
+export function createBlankSeedData(): AppData {
+  const now = new Date().toISOString()
+  return { schemaVersion: 3, tasks: [], goals: [], notes: [], completions: {}, checkins: [], weightHistory: [], achievements: [], incidents: [], settings: { displayName: '', streakTarget: 70, theme: 'light', nutritionGoal: 'balanced' }, createdAt: now, updatedAt: now }
+}
