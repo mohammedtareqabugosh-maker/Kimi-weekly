@@ -32,7 +32,7 @@ function mergeAccountData(local: AppData, remote: AppData): AppData {
     updatedAt: new Date().toISOString(),
   }
 }
-import { hasStoredData, loadData, saveData, setStorageUserId } from './lib/storage'
+import { loadData, saveData, setStorageUserId } from './lib/storage'
 import { validateBackup } from './lib/validation'
 import { isSupabaseConfigured, supabase } from './lib/supabase'
 import { CheckCircle2, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck } from 'lucide-react'
