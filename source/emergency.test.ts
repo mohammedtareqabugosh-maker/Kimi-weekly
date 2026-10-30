@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { Task } from '../types'
-import { applyReplan, buildReplan } from './emergency'
+import type { Task } from './src/types'
+import { applyReplan, buildReplan } from './src/lib/emergency'
 
 const make = (id: string, start: string, end: string, fixed = false, type: Task['type'] = 'study'): Task => ({ id, title: id, type, day: 0, start, end, notes: '', fixed, allowSplit: true, countsTowardsProgress: type !== 'rest' })
 
