@@ -61,9 +61,9 @@ export function SharedSchedulePage({ onImport, onImportMany }: Props) {
       const result=await response.json()
       if(!response.ok||!Array.isArray(result))throw new Error(result.message||'تعذّر تحميل الجدول المشترك. تحقق من إعداد جدول shared_schedule في Supabase.')
       setRows(result as Entry[])
-      let synced=0
-      for(const row of result as Entry[]) if(row.kind==='meal'&&row.starts_at){const when=new Date(row.starts_at);if(!Number.isNaN(when.getTime())){try{onImport({externalId:`shared-schedule-${row.id}`,name:row.title,kind:row.meal_type||'وجبة',date:dateKey(when),day:when.getDay(),start:`${pad(when.getHours())}:${pad(when.getMinutes())}`,end:endTime(when),calories:Number(row.calories)||0,protein:Number(row.protein)||0,source:'الجدول الموحد'}) ;synced++}catch{/* invalid cloud entries remain visible here without breaking the rest */}}}
-      setMessage(`تم تحميل ${result.length} عنصرًا للأسبوع. ${synced? 'تم تحديث الوجبات المرتبطة في جدولك المحلي أيضًا.':''}`)
+      const payloads=(result as Entry[]).filter(row=>row.kind==='meal'&&row.starts_at).flatMap(row=>{const when=new Date(row.starts_at);return Number.isNaN(when.getTime())?[]:[{externalId:`shared-schedule-${row.id}`,name:row.title,kind:row.meal_type||'وجبة',date:dateKey(when),day:when.getDay(),start:`${pad(when.getHours())}:${pad(when.getMinutes())}`,end:endTime(when),calories:Number(row.calories)||0,protein:Number(row.protein)||0,source:'الجدول الموحد'}]})
+      onImportMany(payloads)
+      setMessage(`تم تحميل ${result.length} عنصرًا للأسبوع. ${payloads.length?'تمت مزامنة الوجبات إلى جدولك المحلي.':''}`)
     }catch(e){setMessage(e instanceof Error?e.message:'تعذر الاتصال بالجدول المشترك.')}finally{setBusy(false)}
   }
   useEffect(()=>{if(session)void pull(session)},[selectedDate,session])

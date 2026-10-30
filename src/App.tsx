@@ -142,7 +142,14 @@ export default function App() {
     setDeleteTarget(null)
   }
 
-  const importManyMealPayloads = (payloads: unknown[]) => {\n    if (!data || payloads.length === 0) return\n    let next = data\n    for (const payload of payloads) next = importMeal(next, payload).data\n    setData(next)\n  }\n\n  const importMealPayload = (payload: unknown): 'imported' | 'updated' => {
+  const importManyMealPayloads = (payloads: unknown[]) => {
+    if (!data || payloads.length === 0) return
+    let next = data
+    for (const payload of payloads) next = importMeal(next, payload).data
+    setData(next)
+  }
+
+  const importMealPayload = (payload: unknown): 'imported' | 'updated' => {
     if (!data) throw new Error('البيانات غير جاهزة.')
     const result = importMeal(data, payload)
     setData(result.data)
