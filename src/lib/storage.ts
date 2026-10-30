@@ -28,7 +28,14 @@ export async function loadData(): Promise<AppData> {
       await database.put(STORE_NAME, seed, DATA_KEY)
       return seed
     }
-    const validated = validateBackup(stored)\n    if (validated.schemaVersion < 2) {\n      // Replace only the app's old built-in template tasks; preserve custom tasks, goals, notes and completion history.\n      const legacyTemplateId = /^(sun_|wake_\\d|work_\\d|study_\\d|commute_\\d|meal_\\d_(breakfast|dinner)|mon_online|tue_online)/\n      const fresh = createSeedData()\n      return { ...validated, schemaVersion: 2, tasks: [...fresh.tasks, ...validated.tasks.filter((task) => !legacyTemplateId.test(task.id))] }\n    }\n    return validated
+    const validated = validateBackup(stored)
+    if (validated.schemaVersion < 2) {
+      // Replace only the app's old built-in template tasks; preserve custom tasks, goals, notes and completion history.
+      const legacyTemplateId = /^(sun_|wake_\d|work_\d|study_\d|commute_\d|meal_\d_(breakfast|dinner)|mon_online|tue_online)/
+      const fresh = createSeedData()
+      return { ...validated, schemaVersion: 2, tasks: [...fresh.tasks, ...validated.tasks.filter((task) => !legacyTemplateId.test(task.id))] }
+    }
+    return validated
   } catch (error) {
     throw new Error(`تعذر قراءة البيانات المحلية: ${error instanceof Error ? error.message : 'خطأ غير معروف'}`)
   }
