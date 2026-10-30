@@ -147,6 +147,13 @@ export default function AuthGate() {
     return cloudSaveQueue.current
   }, [user?.id])
 
+  const loadCloudData = useCallback(async (): Promise<AppData | null> => {
+    if (!supabase || !user) throw new Error('جلسة الحساب غير متاحة.')
+    const { data: row, error } = await supabase.from('user_app_data').select('data').eq('user_id', user.id).maybeSingle()
+    if (error) throw error
+    return row?.data ? validateBackup(row.data) : null
+  }, [user?.id])
+
   const signOut = useCallback(async () => {
     if (!supabase) return
     const { error } = await supabase.auth.signOut()
@@ -158,5 +165,5 @@ export default function AuthGate() {
   if (!session || !user) return <AuthScreen />
   if (accountError) return <main className="auth-loading"><div className="auth-brand-mark"><img src="./icons/nassq.svg" alt="شعار نَسّق" /></div><h1>تعذّرت مزامنة الحساب</h1><p>{accountError}</p><p>بيانات الجهاز لم تُحذف. افحص إعدادات قاعدة البيانات وسياسة الوصول ثم أعد المحاولة.</p><button className="auth-primary" onClick={()=>{setAccountError('');setReady(false);setSessionChecked(false);supabase?.auth.getSession().then(({data})=>{setSession(data.session);setUser(data.session?.user??null);setSessionChecked(true)})}}>إعادة المحاولة</button><button className="auth-text-button" onClick={signOut}>تسجيل الخروج</button></main>
   if (!ready) return <main className="auth-loading"><div className="auth-brand-mark"><img src="./icons/nassq.svg" alt="شعار نَسّق" /></div><p>جارٍ تحميل جدولك وأهدافك ومزامنة بياناتك بأمان…</p><div className="loading-line"><span /></div></main>
-  return <AppContent userEmail={user.email ?? ''} onSignOut={signOut} saveCloudData={saveCloudData}/>
+  return <AppContent userEmail={user.email ?? ''} onSignOut={signOut} saveCloudData={saveCloudData} loadCloudData={loadCloudData}/>
 }
