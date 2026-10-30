@@ -15,6 +15,7 @@ import { NotesPage } from './pages/NotesPage'
 import { StatsPage } from './pages/StatsPage'
 import { EmergencyPage } from './pages/EmergencyPage'
 import { SettingsPage } from './pages/SettingsPage'
+import { SharedSchedulePage } from './pages/SharedSchedulePage'
 
 interface EditorState { initial?: Task; copy: boolean; quick: boolean; defaultType?: Task['type'] }
 interface DeleteTarget { kind: 'task' | 'goal' | 'note'; id: string; title: string }
@@ -159,7 +160,7 @@ export default function App() {
   if (!data) return <main className="loading-state"><Brand /><div className="loading-line"><span /></div><p>نفتح جدولك المحفوظ على هذا الجهاز…</p></main>
 
   const shared = { data, selectedDay, selectedDate, onSelectDay: selectDay, onResetDay: resetSelectedDay, onAdd: (quick = false) => openEditor(quick), onEdit: (task: Task) => openEditor(false, task), onDuplicate: (task: Task) => openEditor(false, task, true), onDelete: askDeleteTask, onToggle: toggleTask }
-  const activePrimary = ['notes', 'stats', 'settings', 'emergency'].includes(view) ? 'more' : view
+  const activePrimary = ['notes', 'stats', 'settings', 'emergency', 'shared'].includes(view) ? 'more' : view
 
   return (
     <div className="app-shell">
@@ -168,7 +169,7 @@ export default function App() {
         <Brand />
         <nav aria-label="التنقل الرئيسي">{primaryNav.map(({ view: target, label, icon: Icon }) => <button type="button" key={target} className={activePrimary === target ? 'active' : ''} onClick={() => navigate(target)}><Icon size={20} /><span>{label}</span></button>)}</nav>
         <div className="sidebar-divider" />
-        <nav aria-label="أدوات إضافية">{[{ view: 'emergency' as View, label: 'مخرج الطوارئ', icon: Sparkles }, { view: 'notes' as View, label: 'الملاحظات', icon: NotebookPen }, { view: 'stats' as View, label: 'الإحصائيات', icon: BarChart3 }, { view: 'settings' as View, label: 'الإعدادات', icon: Settings }].map(({ view: target, label, icon: Icon }) => <button type="button" key={target} className={view === target ? 'active' : ''} onClick={() => navigate(target)}><Icon size={20} /><span>{label}</span></button>)}</nav>
+        <nav aria-label="أدوات إضافية">{[{ view: 'emergency' as View, label: 'مخرج الطوارئ', icon: Sparkles }, { view: 'notes' as View, label: 'الملاحظات', icon: NotebookPen }, { view: 'stats' as View, label: 'الإحصائيات', icon: BarChart3 }, { view: 'shared' as View, label: 'الجدول الموحد', icon: CalendarDays }, { view: 'settings' as View, label: 'الإعدادات', icon: Settings }].map(({ view: target, label, icon: Icon }) => <button type="button" key={target} className={view === target ? 'active' : ''} onClick={() => navigate(target)}><Icon size={20} /><span>{label}</span></button>)}</nav>
         <div className="sidebar-foot"><span className={`save-indicator ${saveStatus}`}><i />{saveStatus === 'saving' ? 'جارٍ الحفظ' : saveStatus === 'error' ? 'تعذر الحفظ' : 'محفوظ محليًا'}</span><small>لا حساب. لا مزامنة تلقائية.</small></div>
       </aside>
 
@@ -182,6 +183,7 @@ export default function App() {
         {view === 'more' && <MorePage onNavigate={navigate} online={online} />}
         {view === 'notes' && <NotesPage notes={data.notes} tasks={data.tasks} onCommit={commitNotes} onDelete={(note) => setDeleteTarget({ kind: 'note', id: note.id, title: note.title })} />}
         {view === 'stats' && <StatsPage data={data} selectedDate={selectedDate} onProgressChange={(patch) => updateData((current) => ({ ...current, ...patch, updatedAt: new Date().toISOString() }))} />}
+        {view === 'shared' && <SharedSchedulePage onImport={importMealPayload} />}
         {view === 'emergency' && <EmergencyPage data={data} selectedDay={selectedDay} selectedDate={selectedDate} onApply={(tasks) => { updateData((current) => ({ ...current, tasks })); setToast({ message: 'طُبّقت التعديلات المقترحة بعد موافقتك.' }) }} />}
         {view === 'settings' && <SettingsPage data={data} onSettings={updateSettings} onReplace={(replacement) => setData(replacement)} canInstall={Boolean(installPrompt)} onInstall={install} />}
       </main>

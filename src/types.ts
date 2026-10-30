@@ -101,6 +101,7 @@ export type View =
   | 'notes'
   | 'stats'
   | 'settings'
+  | 'shared'
 
 export interface ReplanProposal {
   taskId: string
