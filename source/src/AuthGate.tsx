@@ -83,14 +83,14 @@ function GoogleMark() {
 
 export default function AuthGate() {
   const [session, setSession] = useState<Session | null>(null)
-  const [sessionChecked, setSessionChecked] = useState(false)
+  const [sessionChecked, setSessionChecked] = useState(!supabase)
   const [ready, setReady] = useState(false)
   const [accountError, setAccountError] = useState('')
   const [user, setUser] = useState<User | null>(null)
   const cloudSaveQueue = useRef<Promise<void>>(Promise.resolve())
 
   useEffect(() => {
-    if (!supabase) { setSessionChecked(true); return }
+    if (!supabase) return
     let active = true
     supabase.auth.getSession().then(({ data, error }) => {
       if (!active) return
@@ -109,9 +109,8 @@ export default function AuthGate() {
   }, [])
 
   useEffect(() => {
-    if (!sessionChecked || !user || !supabase) { if (sessionChecked && !user) setReady(false); return }
+    if (!sessionChecked || !user || !supabase) return
     let active = true
-    setReady(false); setAccountError('')
     ;(async () => {
       await setStorageUserId(user.id)
       const localExists = await hasStoredData()
