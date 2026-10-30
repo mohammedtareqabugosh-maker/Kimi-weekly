@@ -10,20 +10,6 @@ function task(id: string, day: number, start: string, end: string, title: string
   }
 }
 
-function meals(day: number, breakfast: string, snack: string, lunch: string, dinner: string): Task[] {
-  return [
-    task(`meal_${day}_breakfast`, day, breakfast, addMinutes(breakfast, 15), 'الإفطار', 'meal', { fixed: false }),
-    task(`meal_${day}_snack`, day, snack, addMinutes(snack, 15), 'وجبة خفيفة', 'meal', { fixed: false }),
-    task(`meal_${day}_lunch`, day, lunch, addMinutes(lunch, 30), 'الغداء', 'meal', { fixed: false }),
-    task(`meal_${day}_dinner`, day, dinner, addMinutes(dinner, 30), 'العشاء', 'meal', { fixed: false }),
-  ]
-}
-function addMinutes(time: string, minutes: number): string {
-  const [h, m] = time.split(':').map(Number)
-  const total = (h * 60 + m + minutes) % 1440
-  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
-}
-
 export function createSeedData(): AppData {
   const now = new Date().toISOString()
   const tasks: Task[] = [
