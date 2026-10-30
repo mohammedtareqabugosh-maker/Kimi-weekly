@@ -3,6 +3,35 @@ import type { FormEvent } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { AppContent } from './App'
 import type { AppData } from './types'
+
+function mergeAccountData(local: AppData, remote: AppData): AppData {
+  const mergeById = <T extends { id: string }>(first: T[], second: T[]) => {
+    const map = new Map<string, T>()
+    for (const item of second) map.set(item.id, item)
+    for (const item of first) map.set(item.id, item)
+    return [...map.values()]
+  }
+  return {
+    ...remote,
+    ...local,
+    schemaVersion: Math.max(local.schemaVersion || 1, remote.schemaVersion || 1),
+    tasks: mergeById(local.tasks, remote.tasks),
+    goals: mergeById(local.goals, remote.goals),
+    notes: mergeById(local.notes, remote.notes),
+    completions: { ...remote.completions, ...local.completions },
+    checkins: [...new Set([...remote.checkins, ...local.checkins])],
+    weightHistory: mergeById(local.weightHistory, remote.weightHistory),
+    achievements: mergeById(local.achievements, remote.achievements),
+    incidents: mergeById(local.incidents, remote.incidents),
+    settings: {
+      ...remote.settings,
+      ...local.settings,
+      displayName: local.settings.displayName || remote.settings.displayName,
+    },
+    createdAt: [local.createdAt, remote.createdAt].filter(Boolean).sort()[0] || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
+}
 import { hasStoredData, loadData, saveData, setStorageUserId } from './lib/storage'
 import { validateBackup } from './lib/validation'
 import { isSupabaseConfigured, supabase } from './lib/supabase'
@@ -120,12 +149,12 @@ export default function AuthGate() {
       let chosen: AppData
       if (remoteRow?.data) {
         const remoteData = validateBackup(remoteRow.data)
-        const remoteTime = Date.parse(remoteData.updatedAt || remoteRow.updated_at || '')
-        const localTime = Date.parse(localData.updatedAt || '')
         const hasContent = (value: AppData) => value.tasks.length > 0 || value.goals.length > 0 || value.notes.length > 0 || Object.keys(value.completions).length > 0 || value.checkins.length > 0 || value.weightHistory.length > 0 || value.achievements.length > 0 || value.incidents.length > 0 || Boolean(value.settings.displayName)
         const localHasContent = hasContent(localData)
         const remoteHasContent = hasContent(remoteData)
-        chosen = localHasContent && !remoteHasContent ? localData : !localHasContent && remoteHasContent ? remoteData : localExists && localTime > remoteTime ? localData : remoteData
+        if (localHasContent && remoteHasContent) chosen = mergeAccountData(localData, remoteData)
+        else if (localHasContent) chosen = localData
+        else chosen = remoteData
       } else {
         chosen = localData
       }
