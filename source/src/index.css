@@ -572,7 +572,10 @@ textarea.field { resize: vertical; min-height: 80px; }
 .auth-loading { min-height:100dvh; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:14px; padding:24px; background:#151a18; color:#f6f3e9; text-align:center; }
 .auth-loading p { max-width:440px; color:#c2c8bf; }
 .auth-loading .auth-primary { max-width:260px; }
-.account-strip { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 13px; margin-bottom:18px; border:1px solid var(--line); border-radius:14px; background:var(--surface); font-size:13px; }
-.account-strip span { min-width:0; overflow-wrap:anywhere; color:var(--muted); }
-.account-strip button { display:inline-flex; align-items:center; gap:6px; flex-shrink:0; border:1px solid var(--line); border-radius:10px; background:var(--surface-subtle); padding:7px 10px; font-size:12px; font-weight:800; }
+.account-strip { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; padding:10px 13px; margin-bottom:18px; border:1px solid var(--line); border-radius:14px; background:var(--surface); font-size:13px; }
+.account-strip > span { min-width:0; overflow-wrap:anywhere; color:var(--muted); }
+.account-actions { display:flex; align-items:center; flex-wrap:wrap; gap:7px; }
+.account-strip button { display:inline-flex; align-items:center; justify-content:center; gap:6px; flex-shrink:0; border:1px solid var(--line); border-radius:10px; background:var(--surface-subtle); padding:7px 10px; font-size:12px; font-weight:800; }
+.account-strip button:disabled { opacity:.55; cursor:wait; }
+@media (max-width:480px) { .account-strip > span { width:100%; } .account-actions { width:100%; } .account-actions button { flex:1 1 auto; } }
 @media (max-width:380px) { .auth-card { padding:26px 18px 20px; } .auth-card h1 { font-size:25px; } }
