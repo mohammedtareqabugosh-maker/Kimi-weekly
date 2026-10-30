@@ -172,7 +172,7 @@ export default function App() {
         {view === 'meals' && <MealsPage tasks={data.tasks} selectedDay={selectedDay} selectedDate={selectedDate} completions={data.completions} onSelectDay={selectDay} onAdd={() => openEditor(false, undefined, false, 'meal')} onToggle={toggleTask} onImport={importMealPayload} onUnlink={(task) => { updateData((current) => ({ ...current, tasks: current.tasks.map((item) => item.id === task.id ? { ...item, meal: undefined } : item) })); setToast({ message: 'أُزيل الربط وبقي موعد الوجبة في الجدول.' }) }} />}
         {view === 'more' && <MorePage onNavigate={navigate} online={online} />}
         {view === 'notes' && <NotesPage notes={data.notes} tasks={data.tasks} onCommit={commitNotes} onDelete={(note) => setDeleteTarget({ kind: 'note', id: note.id, title: note.title })} />}
-        {view === 'stats' && <StatsPage data={data} selectedDate={selectedDate} />}
+        {view === 'stats' && <StatsPage data={data} selectedDate={selectedDate} onProgressChange={(patch) => updateData((current) => ({ ...current, ...patch, updatedAt: new Date().toISOString() }))} />}
         {view === 'emergency' && <EmergencyPage data={data} selectedDay={selectedDay} selectedDate={selectedDate} onApply={(tasks) => { updateData((current) => ({ ...current, tasks })); setToast({ message: 'طُبّقت التعديلات المقترحة بعد موافقتك.' }) }} />}
         {view === 'settings' && <SettingsPage data={data} onSettings={updateSettings} onReplace={(replacement) => setData(replacement)} canInstall={Boolean(installPrompt)} onInstall={install} />}
       </main>

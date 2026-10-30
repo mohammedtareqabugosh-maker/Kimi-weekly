@@ -72,12 +72,20 @@ export interface Settings {
   theme: 'light' | 'dark'
 }
 
+export interface WeightRecord { id: string; date: string; weight: number }
+export interface AchievementRecord { id: string; title: string; date: string }
+export interface IncidentRecord { id: string; date: string; text: string }
+
 export interface AppData {
   schemaVersion: number
   tasks: Task[]
   goals: Goal[]
   notes: Note[]
   completions: Record<string, boolean>
+  checkins: string[]
+  weightHistory: WeightRecord[]
+  achievements: AchievementRecord[]
+  incidents: IncidentRecord[]
   settings: Settings
   createdAt: string
   updatedAt: string
