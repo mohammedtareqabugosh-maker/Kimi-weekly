@@ -7,7 +7,7 @@ const SUPABASE_KEY = 'sb_publishable_9dzltRprFtyXPyg0Iul3aQ_4SU1VTG9'
 type User = { id: string; email?: string }
 type Entry = { id: string; user_id?: string; kind: 'task'|'appointment'|'meal'; title: string; details?: string; starts_at: string; meal_type?: string; calories?: number; protein?: number; source_app?: string; updated_at?: string }
 type Session = { access_token: string; refresh_token?: string; user: User }
-type Props = { onImport: (payload: unknown) => 'imported'|'updated'; onImportMany: (payloads: unknown[]) => void }
+type Props = { onImportMany: (payloads: unknown[]) => void }
 const pad = (n:number) => String(n).padStart(2,'0')
 const dateKey = (d:Date) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`
 const fromDateKey = (s:string) => { const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d,12) }
@@ -15,7 +15,7 @@ const localDateTime = (d:Date) => `${dateKey(d)}T${pad(d.getHours())}:${pad(d.ge
 const endTime = (d:Date) => { const n = new Date(d.getTime()+30*60000); return `${pad(n.getHours())}:${pad(n.getMinutes())}` }
 const kindLabel = (k:Entry['kind']) => k === 'meal' ? 'وجبة' : k === 'appointment' ? 'موعد' : 'مهمة'
 
-export function SharedSchedulePage({ onImport, onImportMany }: Props) {
+export function SharedSchedulePage({ onImportMany }: Props) {
   const [session, setSession] = useState<Session|null>(null)
   const [email,setEmail]=useState('')
   const [password,setPassword]=useState('')

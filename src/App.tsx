@@ -190,7 +190,7 @@ export default function App() {
         {view === 'more' && <MorePage onNavigate={navigate} online={online} />}
         {view === 'notes' && <NotesPage notes={data.notes} tasks={data.tasks} onCommit={commitNotes} onDelete={(note) => setDeleteTarget({ kind: 'note', id: note.id, title: note.title })} />}
         {view === 'stats' && <StatsPage data={data} selectedDate={selectedDate} onProgressChange={(patch) => updateData((current) => ({ ...current, ...patch, updatedAt: new Date().toISOString() }))} />}
-        {view === 'shared' && <SharedSchedulePage onImport={importMealPayload} onImportMany={importManyMealPayloads} />}
+        {view === 'shared' && <SharedSchedulePage onImportMany={importManyMealPayloads} />}
         {view === 'emergency' && <EmergencyPage data={data} selectedDay={selectedDay} selectedDate={selectedDate} onApply={(tasks) => { updateData((current) => ({ ...current, tasks })); setToast({ message: 'طُبّقت التعديلات المقترحة بعد موافقتك.' }) }} />}
         {view === 'settings' && <SettingsPage data={data} onSettings={updateSettings} onReplace={(replacement) => setData(replacement)} canInstall={Boolean(installPrompt)} onInstall={install} />}
       </main>
