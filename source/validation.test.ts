@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { createSeedData } from '../data/seed'
-import { validateBackup } from './validation'
+import { createSeedData } from './src/data/seed'
+import { validateBackup } from './src/lib/validation'
 
 describe('التحقق من النسخ الاحتياطية', () => {
   it('يقبل نسخة التطبيق الصالحة ويحافظ على محتواها', () => {
