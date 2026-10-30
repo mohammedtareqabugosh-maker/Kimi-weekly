@@ -1,4 +1,4 @@
-const CACHE = 'jadwali-shell-v9'
+const CACHE = 'jadwali-shell-v10'
 const SHELL = ['./icons/nassq.svg', './', './index.html', './manifest.webmanifest', './manifest-blank.webmanifest', './blank.html', './icon-192.png', './icon-512.png', './apple-touch-icon.png']
 
 async function cacheAppShell() {
@@ -41,9 +41,18 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return
 
   if (request.mode === 'navigate') {
-    event.respondWith(fetch(request).then((response) => cacheResponse(request, response)).catch(async () => {
-      return (await caches.match(request.url.endsWith('/blank.html') ? './blank.html' : './index.html')) || (await caches.match('./index.html')) || (await caches.match('./')) || Response.error()
-    }))
+    event.respondWith((async () => {
+      const cachedPage = await caches.match(request.url.endsWith('/blank.html') ? './blank.html' : './index.html')
+      try {
+        const response = await Promise.race([
+          fetch(request).then((result) => cacheResponse(request, result)),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Navigation timeout')), 8000)),
+        ])
+        return response
+      } catch {
+        return cachedPage || (await caches.match('./index.html')) || (await caches.match('./')) || Response.error()
+      }
+    })())
     return
   }
 
