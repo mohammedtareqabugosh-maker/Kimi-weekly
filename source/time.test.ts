@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { Task } from '../types'
-import { durationMinutes, findAvailableGaps, findConflicts, findSlotForDuration, mergeBusyIntervals, validateTimes } from './time'
+import type { Task } from './src/types'
+import { durationMinutes, findAvailableGaps, findConflicts, findSlotForDuration, mergeBusyIntervals, validateTimes } from './src/lib/time'
 
 const task = (id: string, start: string, end: string, day = 0): Task => ({ id, title: id, type: 'study', day, start, end, notes: '', fixed: false, allowSplit: true, countsTowardsProgress: true })
 
