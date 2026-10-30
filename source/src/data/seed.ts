@@ -11,13 +11,13 @@ export function createSeedData(): AppData {
   const tasks: Task[] = [
     // الأحد: جامعة دون دوام — جدول المستخدم الأصلي
     task('sun_wake',0,'07:15','07:45','الاستيقاظ والتجهيز','personal',{fixed:false}),
-    meal('sun_breakfast',0,'07:45','08:00','الإفطار'),
+    meal('sun_breakfast',0,'11:00','11:15','الإفطار في يوم الجامعة'),
     task('sun_digital',0,'09:00','10:00','محاضرة المنطق الرقمي (Digital Logic)','university'),
     task('sun_algebra',0,'10:00','11:00','محاضرة الجبر الخطي (Linear Algebra)','university'),
-    task('sun_lunch_rest',0,'11:00','13:00','الغداء والراحة','rest',{fixed:false}),
+    task('sun_lunch_rest',0,'11:15','13:00','راحة وتجهيز للمحاضرة التالية','rest',{fixed:false}),
     task('sun_programming',0,'13:00','14:00','محاضرة البرمجة الكينونية (OOP)','university'),
     task('sun_lab',0,'14:00','16:00','مختبر البرمجة الكينونية','university'),
-    task('sun_snack',0,'16:00','16:15','وجبة خفيفة','meal',{fixed:false}),
+    meal('sun_lunch',0,'16:00','16:30','الغداء بعد الجامعة'),
     task('sun_study_oop',0,'16:30','18:30','مذاكرة البرمجة الكينونية','study',{fixed:false,notes:'تدريب عملي وكتابة الأكواد باليد.'}),
     meal('sun_dinner',0,'18:30','19:30','العشاء'),
     task('sun_study_algebra',0,'19:30','21:00','مذاكرة الجبر الخطي','study',{fixed:false}),
@@ -44,10 +44,10 @@ export function createSeedData(): AppData {
     meal('tue_breakfast',2,'11:00','11:15','الإفطار'),
     task('tue_rest',2,'11:50','13:00','راحة وتجهيز للمحاضرة التالية','rest',{fixed:false}),
     task('tue_programming',2,'13:00','14:00','محاضرة البرمجة الكينونية (OOP)','university'),
-    meal('tue_snack',2,'14:00','14:15','وجبة خفيفة بعد الجامعة'),
+    
     task('tue_commute',2,'14:15','15:00','الانتقال إلى العمل','personal',{fixed:true,allowSplit:false,notes:'مدة الانتقال 45 دقيقة.'}),
     task('tue_work',2,'15:00','23:00','العمل','work'),
-    meal('tue_lunch',2,'17:00','19:00','الغداء في استراحة العمل'),
+    meal('tue_lunch',2,'14:00','14:15','الغداء بعد الجامعة'),
     meal('tue_portable',2,'19:00','19:30','الوجبة المحمولة'),
     task('tue_home',2,'23:00','23:45','الانتقال من العمل إلى البيت','personal',{fixed:true,allowSplit:false,notes:'مدة الانتقال 45 دقيقة بحسب توضيح المستخدم.'}),
     meal('tue_dinner',2,'23:45','23:59','عشاء خفيف'),
@@ -72,10 +72,10 @@ export function createSeedData(): AppData {
     meal('thu_breakfast',4,'11:00','11:15','الإفطار'),
     task('thu_rest',4,'11:50','13:00','راحة وتجهيز للمحاضرة التالية','rest',{fixed:false}),
     task('thu_programming',4,'13:00','14:00','محاضرة البرمجة الكينونية (OOP)','university'),
-    meal('thu_snack',4,'14:00','14:15','وجبة خفيفة بعد الجامعة'),
+    
     task('thu_commute',4,'14:15','15:00','الانتقال إلى العمل','personal',{fixed:true,allowSplit:false,notes:'مدة الانتقال 45 دقيقة.'}),
     task('thu_work',4,'15:00','23:00','العمل','work'),
-    meal('thu_lunch',4,'17:00','19:00','الغداء في استراحة العمل'),
+    meal('thu_lunch',4,'14:00','14:15','الغداء بعد الجامعة'),
     meal('thu_portable',4,'19:00','19:30','الوجبة المحمولة'),
     task('thu_home',4,'23:00','23:45','الانتقال من العمل إلى البيت','personal',{fixed:true,allowSplit:false,notes:'مدة الانتقال 45 دقيقة بحسب توضيح المستخدم.'}),
     meal('thu_dinner',4,'23:45','23:59','عشاء خفيف'),
@@ -106,7 +106,7 @@ export function createSeedData(): AppData {
     task('sat_sleep',6,'23:30','23:59','النوم','sleep'),
   ]
   return {
-    schemaVersion: 3, tasks,
+    schemaVersion: 4, tasks,
     goals: [
       { id: 'goal_study', name: 'المذاكرة الذاتية', description: 'هدف أسبوعي قابل للتعديل', target: 9, current: 0, unit: 'ساعة', status: 'active', createdAt: now },
       { id: 'goal_reading', name: 'القراءة', description: 'هدف أسبوعي قابل للتعديل', target: 5, current: 0, unit: 'جلسة', status: 'active', createdAt: now },
@@ -120,5 +120,5 @@ export function createSeedData(): AppData {
 /** Empty starter data for people who want to build their own weekly schedule. */
 export function createBlankSeedData(): AppData {
   const now = new Date().toISOString()
-  return { schemaVersion: 3, tasks: [], goals: [], notes: [], completions: {}, checkins: [], weightHistory: [], achievements: [], incidents: [], settings: { displayName: '', streakTarget: 70, theme: 'light', nutritionGoal: 'balanced' }, createdAt: now, updatedAt: now }
+  return { schemaVersion: 4, tasks: [], goals: [], notes: [], completions: {}, checkins: [], weightHistory: [], achievements: [], incidents: [], settings: { displayName: '', streakTarget: 70, theme: 'light', nutritionGoal: 'balanced' }, createdAt: now, updatedAt: now }
 }
