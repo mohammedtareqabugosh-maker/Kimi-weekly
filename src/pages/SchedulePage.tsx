@@ -13,6 +13,7 @@ interface SchedulePageProps {
   selectedDay: number
   selectedDate: Date
   onSelectDay: (day: number) => void
+  onResetDay: () => void
   onAdd: (quick?: boolean) => void
   onEdit: (task: Task) => void
   onDuplicate: (task: Task) => void
