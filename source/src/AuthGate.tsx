@@ -39,6 +39,16 @@ import { CheckCircle2, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck } from 'lucid
 
 type AuthMode = 'login' | 'signup' | 'reset'
 
+function withTimeout<T>(promise: PromiseLike<T>, milliseconds: number, message: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = window.setTimeout(() => reject(new Error(message)), milliseconds)
+    Promise.resolve(promise).then(
+      (value) => { window.clearTimeout(timer); resolve(value) },
+      (error) => { window.clearTimeout(timer); reject(error) },
+    )
+  })
+}
+
 function AuthScreen() {
   const [mode, setMode] = useState<AuthMode>('login')
   const [email, setEmail] = useState('')
@@ -121,11 +131,21 @@ export default function AuthGate() {
   useEffect(() => {
     if (!supabase) return
     let active = true
-    supabase.auth.getSession().then(({ data, error }) => {
+    withTimeout(
+      supabase.auth.getSession(),
+      10000,
+      'تأخر التحقق من جلسة الدخول. أعد فتح التطبيق وتأكد من الاتصال بالإنترنت.',
+    ).then(({ data, error }) => {
       if (!active) return
       if (error) setAccountError(error.message)
       setSession(data.session)
       setUser(data.session?.user ?? null)
+      setSessionChecked(true)
+    }).catch(() => {
+      if (!active) return
+      // Never leave the app on an endless session-loading screen.
+      setSession(null)
+      setUser(null)
       setSessionChecked(true)
     })
     const { data: listener } = supabase.auth.onAuthStateChange((event, nextSession) => {
@@ -140,10 +160,16 @@ export default function AuthGate() {
   useEffect(() => {
     if (!sessionChecked || !user || !supabase) return
     let active = true
+    let localDataLoaded = false
     ;(async () => {
-      await setStorageUserId(user.id)
-      const localData = await loadData()
-      const { data: remoteRow, error } = await supabase!.from('user_app_data').select('data, updated_at').eq('user_id', user.id).maybeSingle()
+      await withTimeout(setStorageUserId(user.id), 10000, 'تأخر فتح مساحة بيانات الحساب على الجهاز.')
+      const localData = await withTimeout(loadData(), 10000, 'تأخر تحميل البيانات المحفوظة على الجهاز.')
+      localDataLoaded = true
+      const { data: remoteRow, error } = await withTimeout(
+        supabase!.from('user_app_data').select('data, updated_at').eq('user_id', user.id).maybeSingle(),
+        10000,
+        'انتهت مهلة مزامنة البيانات السحابية. سيُفتح التطبيق ببيانات الجهاز أولًا.',
+      )
       if (error) throw error
       let chosen: AppData
       if (remoteRow?.data) {
@@ -159,10 +185,19 @@ export default function AuthGate() {
       }
       const synchronized = { ...chosen, updatedAt: new Date().toISOString() }
       await saveData(synchronized)
-      const { error: syncError } = await supabase!.from('user_app_data').upsert({ user_id: user.id, data: synchronized, updated_at: synchronized.updatedAt }, { onConflict: 'user_id' })
+      const { error: syncError } = await withTimeout(
+        supabase!.from('user_app_data').upsert({ user_id: user.id, data: synchronized, updated_at: synchronized.updatedAt }, { onConflict: 'user_id' }),
+        10000,
+        'انتهت مهلة حفظ النسخة السحابية. ستبقى بيانات الجهاز متاحة ويمكن إعادة المزامنة لاحقًا.',
+      )
       if (syncError) throw syncError
-      if (active) setReady(true)
-    })().catch((e) => { if (active) setAccountError(e instanceof Error ? e.message : 'تعذّرت مزامنة بيانات الحساب.') })
+      if (active) { setAccountError(''); setReady(true) }
+    })().catch((e) => {
+      if (!active) return
+      setAccountError(e instanceof Error ? e.message : 'تعذّرت مزامنة بيانات الحساب.')
+      // Local data is still safe to use if the cloud is unavailable.
+      if (localDataLoaded) setReady(true)
+    })
     return () => { active = false }
   }, [sessionChecked, user?.id])
 
@@ -191,7 +226,7 @@ export default function AuthGate() {
 
   if (!sessionChecked) return <main className="auth-loading"><div className="auth-brand-mark"><img src="./icons/nassq.svg" alt="شعار نَسّق" /></div><p>جارٍ التحقق من الجلسة…</p></main>
   if (!session || !user) return <AuthScreen />
-  if (accountError) return <main className="auth-loading"><div className="auth-brand-mark"><img src="./icons/nassq.svg" alt="شعار نَسّق" /></div><h1>تعذّرت مزامنة الحساب</h1><p>{accountError}</p><p>بيانات الجهاز لم تُحذف. افحص إعدادات قاعدة البيانات وسياسة الوصول ثم أعد المحاولة.</p><button className="auth-primary" onClick={()=>{setAccountError('');setReady(false);setSessionChecked(false);supabase?.auth.getSession().then(({data})=>{setSession(data.session);setUser(data.session?.user??null);setSessionChecked(true)})}}>إعادة المحاولة</button><button className="auth-text-button" onClick={signOut}>تسجيل الخروج</button></main>
+  if (accountError && !ready) return <main className="auth-loading"><div className="auth-brand-mark"><img src="./icons/nassq.svg" alt="شعار نَسّق" /></div><h1>تعذّرت مزامنة الحساب</h1><p>{accountError}</p><p>بيانات الجهاز لم تُحذف. افحص إعدادات قاعدة البيانات وسياسة الوصول ثم أعد المحاولة.</p><button className="auth-primary" onClick={()=>{setAccountError('');setReady(false);setSessionChecked(false);supabase?.auth.getSession().then(({data})=>{setSession(data.session);setUser(data.session?.user??null);setSessionChecked(true)})}}>إعادة المحاولة</button><button className="auth-text-button" onClick={signOut}>تسجيل الخروج</button></main>
   if (!ready) return <main className="auth-loading"><div className="auth-brand-mark"><img src="./icons/nassq.svg" alt="شعار نَسّق" /></div><p>جارٍ تحميل جدولك وأهدافك ومزامنة بياناتك بأمان…</p><div className="loading-line"><span /></div></main>
   return <AppContent userEmail={user.email ?? ''} onSignOut={signOut} saveCloudData={saveCloudData} loadCloudData={loadCloudData}/>
 }
