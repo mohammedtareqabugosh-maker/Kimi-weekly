@@ -488,3 +488,14 @@ textarea.field { resize: vertical; min-height: 80px; }
   body { background: white; color: black; }
   .content-section, .task-row { box-shadow: none; break-inside: avoid; }
 }
+
+
+/* Mobile RTL fixes: keep each weekday inside its own grid cell. */
+.day-strip { width: 100%; min-width: 0; grid-template-columns: repeat(7, minmax(0, 1fr)); direction: rtl; overflow: hidden; }
+.day-chip { width: 100%; min-width: 0; padding-inline: 0; overflow: hidden; }
+.day-chip span { display: block; max-width: 100%; font-size: clamp(9px, 2.8vw, 12px); line-height: 1.35; white-space: normal; overflow-wrap: anywhere; text-align: center; }
+.day-chip strong { display: block; line-height: 1.35; font-variant-numeric: tabular-nums; }
+.task-row.type-meal { border-color: color-mix(in srgb, #438064 35%, var(--line)); background: color-mix(in srgb, #438064 7%, var(--surface)); }
+.task-row.type-meal.meal-lunch { border: 2px solid #438064; background: color-mix(in srgb, #438064 11%, var(--surface)); box-shadow: 0 4px 14px -10px #438064; }
+.task-row.type-meal.meal-lunch .task-title-line h3::before { content: 'الغداء · '; color: #438064; font-size: .82em; }
+@media (max-width: 420px) { .day-strip { gap: 2px; padding: 3px; } .day-chip { min-height: 58px; border-radius: 10px; } .day-chip span { font-size: 10px; letter-spacing: -0.2px; } }
