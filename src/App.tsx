@@ -142,7 +142,7 @@ export default function App() {
     setDeleteTarget(null)
   }
 
-  const importMealPayload = (payload: unknown): 'imported' | 'updated' => {
+  const importManyMealPayloads = (payloads: unknown[]) => {\n    if (!data || payloads.length === 0) return\n    let next = data\n    for (const payload of payloads) next = importMeal(next, payload).data\n    setData(next)\n  }\n\n  const importMealPayload = (payload: unknown): 'imported' | 'updated' => {
     if (!data) throw new Error('البيانات غير جاهزة.')
     const result = importMeal(data, payload)
     setData(result.data)
@@ -183,7 +183,7 @@ export default function App() {
         {view === 'more' && <MorePage onNavigate={navigate} online={online} />}
         {view === 'notes' && <NotesPage notes={data.notes} tasks={data.tasks} onCommit={commitNotes} onDelete={(note) => setDeleteTarget({ kind: 'note', id: note.id, title: note.title })} />}
         {view === 'stats' && <StatsPage data={data} selectedDate={selectedDate} onProgressChange={(patch) => updateData((current) => ({ ...current, ...patch, updatedAt: new Date().toISOString() }))} />}
-        {view === 'shared' && <SharedSchedulePage onImport={importMealPayload} />}
+        {view === 'shared' && <SharedSchedulePage onImport={importMealPayload} onImportMany={importManyMealPayloads} />}
         {view === 'emergency' && <EmergencyPage data={data} selectedDay={selectedDay} selectedDate={selectedDate} onApply={(tasks) => { updateData((current) => ({ ...current, tasks })); setToast({ message: 'طُبّقت التعديلات المقترحة بعد موافقتك.' }) }} />}
         {view === 'settings' && <SettingsPage data={data} onSettings={updateSettings} onReplace={(replacement) => setData(replacement)} canInstall={Boolean(installPrompt)} onInstall={install} />}
       </main>
