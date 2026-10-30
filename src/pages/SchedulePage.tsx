@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'\nimport { RotateCcw } from 'lucide-react'\nimport { Modal } from '../components/Modal'
 import { AlertTriangle, CalendarPlus, Search } from 'lucide-react'
 import type { AppData, Task } from '../types'
 import { DAYS } from '../types'
@@ -18,9 +18,9 @@ interface SchedulePageProps {
   onToggle: (task: Task) => void
 }
 
-export function SchedulePage({ data, selectedDay, selectedDate, onSelectDay, onAdd, onEdit, onDuplicate, onDelete, onToggle }: SchedulePageProps) {
+export function SchedulePage({ data, selectedDay, selectedDate, onSelectDay, onResetDay, onAdd, onEdit, onDuplicate, onDelete, onToggle }: SchedulePageProps) {
   const [search, setSearch] = useState('')
-  const [filter, setFilter] = useState<'all' | 'remaining' | 'completed'>('all')
+  const [filter, setFilter] = useState<'all' | 'remaining' | 'completed'>('all')\n  const [confirmReset, setConfirmReset] = useState(false)
   const tasks = useMemo(() => data.tasks.filter((task) => {
     if (task.day !== selectedDay) return false
     if (search && !`${task.title} ${task.notes}`.toLowerCase().includes(search.trim().toLowerCase())) return false
@@ -34,11 +34,11 @@ export function SchedulePage({ data, selectedDay, selectedDate, onSelectDay, onA
     <div className="page-stack">
       <section className="page-heading">
         <div><span className="section-kicker">أسبوعك، بالتفصيل</span><h1>الجدول الأسبوعي</h1><p>عدّل يومًا واحدًا أو كرّر مهمة في أيام عدة. كل تغيير تحت سيطرتك.</p></div>
-        <button type="button" className="primary-button" onClick={() => onAdd(false)}><CalendarPlus size={19} /> مهمة مفصلة</button>
+        <div className="heading-actions"><button type="button" className="secondary-button" onClick={() => setConfirmReset(true)}><RotateCcw size={17} /> إعادة ضبط الإنجاز</button><button type="button" className="primary-button" onClick={() => onAdd(false)}><CalendarPlus size={19} /> مهمة مفصلة</button></div>
       </section>
       <DayStrip selectedDay={selectedDay} onSelect={onSelectDay} today={new Date()} />
       {conflictCount > 0 && <div className="inline-alert"><AlertTriangle size={20} /><p>يوجد {conflictCount} تداخل في {DAYS[selectedDay]}. لم نغيّر أي مهمة تلقائيًا؛ افتح المهمة لمراجعة وقتها.</p></div>}
-      <section className="content-section">
+      {confirmReset && <Modal title="إعادة ضبط إنجازات اليوم" onClose={() => setConfirmReset(false)}><div className="delete-confirm"><p>هل تريد إلغاء علامات الإنجاز لهذا اليوم فقط؟</p><span>لن تتغير المهام أو مواعيدها أو إنجازات الأيام الأخرى.</span><div className="modal-actions"><button type="button" className="secondary-button" onClick={() => setConfirmReset(false)}>إلغاء</button><button type="button" className="primary-button" onClick={() => { onResetDay(); setConfirmReset(false) }}>تأكيد إعادة الضبط</button></div></div></Modal>}\n      <section className="content-section">
         <div className="schedule-tools">
           <label className="search-field"><Search size={19} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="ابحث في مهام هذا اليوم" aria-label="البحث في المهام" /></label>
           <div className="segmented-control" aria-label="تصفية المهام">

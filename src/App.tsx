@@ -111,7 +111,7 @@ export default function App() {
     })
   }
 
-  const askDeleteTask = (task: Task) => setDeleteTarget({ kind: 'task', id: task.id, title: task.title })
+  const resetSelectedDay = () => {\n    updateData((current) => {\n      const completions = { ...current.completions }\n      for (const task of current.tasks.filter((item) => item.day === selectedDay)) delete completions[completionKey(selectedDate, task.id)]\n      return { ...current, completions, updatedAt: new Date().toISOString() }\n    })\n    setToast({ message: `أُعيد ضبط إنجازات يوم ${['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'][selectedDay]} فقط.` })\n  }\n\n  const askDeleteTask = (task: Task) => setDeleteTarget({ kind: 'task', id: task.id, title: task.title })
   const confirmDelete = () => {
     if (!deleteTarget || !data) return
     const { kind, id } = deleteTarget
@@ -149,7 +149,7 @@ export default function App() {
   if (loadError) return <main className="fatal-state"><Brand /><h1>تعذر فتح بياناتك</h1><p>{loadError}</p><button type="button" className="primary-button" onClick={() => window.location.reload()}>إعادة المحاولة</button></main>
   if (!data) return <main className="loading-state"><Brand /><div className="loading-line"><span /></div><p>نفتح جدولك المحفوظ على هذا الجهاز…</p></main>
 
-  const shared = { data, selectedDay, selectedDate, onSelectDay: selectDay, onAdd: (quick = false) => openEditor(quick), onEdit: (task: Task) => openEditor(false, task), onDuplicate: (task: Task) => openEditor(false, task, true), onDelete: askDeleteTask, onToggle: toggleTask }
+  const shared = { data, selectedDay, selectedDate, onSelectDay: selectDay, onResetDay: resetSelectedDay, onAdd: (quick = false) => openEditor(quick), onEdit: (task: Task) => openEditor(false, task), onDuplicate: (task: Task) => openEditor(false, task, true), onDelete: askDeleteTask, onToggle: toggleTask }
   const activePrimary = ['notes', 'stats', 'settings', 'emergency'].includes(view) ? 'more' : view
 
   return (
