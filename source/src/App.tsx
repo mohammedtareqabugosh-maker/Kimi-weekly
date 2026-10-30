@@ -178,6 +178,12 @@ export function AppContent({ userEmail, onSignOut, saveCloudData, loadCloudData 
     setManualSyncBusy(true)
     setSaveStatus('saving')
     try {
+      const remote = await loadCloudData()
+      const contentCount = (value: AppData) => value.tasks.length + value.goals.length + value.notes.length + Object.keys(value.completions).length + value.checkins.length + value.weightHistory.length + value.achievements.length + value.incidents.length
+      if (remote && contentCount(remote) > contentCount(data)) {
+        setToast({ message: 'وجدت معلومات أكثر محفوظة في حسابك السحابي من الموجودة على هذا الجهاز. اضغط «تحميل بيانات الحساب» أولًا حتى لا تستبدل معلوماتك القديمة.' })
+        return
+      }
       const snapshot = { ...data, updatedAt: new Date().toISOString() }
       await saveData(snapshot)
       await saveCloudData(snapshot)
