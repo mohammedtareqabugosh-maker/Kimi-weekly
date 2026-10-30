@@ -5,7 +5,7 @@ const SUPABASE_URL = 'https://chcapjgjvvwpljgdffpg.supabase.co'
 const SUPABASE_KEY = 'sb_publishable_9dzltRprFtyXPyg0Iul3aQ_4SU1VTG9'
 type CloudMeal = { id: number | string; client_id?: string | null; meal_name?: string | null; meal_type?: string | null; calories?: number | string | null; protein?: number | string | null; carbs?: number | string | null; fat?: number | string | null; meal_date: string }
 type CloudUser = { id: string; email?: string }
-type Props = { selectedDate: Date; onImport: (payload: unknown) => 'imported' | 'updated }
+type Props = { selectedDate: Date; onImport: (payload: unknown) => 'imported' | 'updated' }
 function dateKey(date: Date) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}` }
 function localTime(date: Date) { return `${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}` }
 function plusMinutes(time: string, amount: number) { const [h,m] = time.split(':').map(Number); const total = (h*60+m+amount)%1440; return `${String(Math.floor(total/60)).padStart(2,'0')}:${String(total%60).padStart(2,'0')}` }
