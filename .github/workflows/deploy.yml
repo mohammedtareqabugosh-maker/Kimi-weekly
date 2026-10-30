@@ -23,7 +23,7 @@ jobs:
           node-version: 22
           cache: npm
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm install --no-audit --no-fund --maxsockets=5 --fetch-retries=5 --fetch-timeout=300000
       - name: Type-check and build
         run: npm run build
       - name: Configure Pages
