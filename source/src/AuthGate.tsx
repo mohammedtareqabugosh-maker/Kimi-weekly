@@ -142,7 +142,6 @@ export default function AuthGate() {
     let active = true
     ;(async () => {
       await setStorageUserId(user.id)
-      const localExists = await hasStoredData()
       const localData = await loadData()
       const { data: remoteRow, error } = await supabase!.from('user_app_data').select('data, updated_at').eq('user_id', user.id).maybeSingle()
       if (error) throw error
