@@ -1,5 +1,5 @@
-const CACHE = 'jadwali-shell-v8'
-const SHELL = ['./', './index.html', './manifest.webmanifest', './manifest-blank.webmanifest', './blank.html', './icon-192.png', './icon-512.png', './apple-touch-icon.png']
+const CACHE = 'jadwali-shell-v9'
+const SHELL = ['./icons/nassq.svg', './', './index.html', './manifest.webmanifest', './manifest-blank.webmanifest', './blank.html', './icon-192.png', './icon-512.png', './apple-touch-icon.png']
 
 async function cacheAppShell() {
   const cache = await caches.open(CACHE)
