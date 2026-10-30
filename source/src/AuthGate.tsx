@@ -87,6 +87,7 @@ export default function AuthGate() {
   const [ready, setReady] = useState(false)
   const [accountError, setAccountError] = useState('')
   const [user, setUser] = useState<User | null>(null)
+  const cloudSaveQueue = useRef<Promise<void>>(Promise.resolve())
 
   useEffect(() => {
     if (!supabase) { setSessionChecked(true); return }
@@ -126,8 +127,9 @@ export default function AuthGate() {
       } else {
         chosen = localData
       }
-      await saveData(chosen)
-      const { error: syncError } = await supabase!.from('user_app_data').upsert({ user_id: user.id, data: chosen, updated_at: chosen.updatedAt || new Date().toISOString() }, { onConflict: 'user_id' })
+      const synchronized = { ...chosen, updatedAt: new Date().toISOString() }
+      await saveData(synchronized)
+      const { error: syncError } = await supabase!.from('user_app_data').upsert({ user_id: user.id, data: synchronized, updated_at: synchronized.updatedAt }, { onConflict: 'user_id' })
       if (syncError) throw syncError
       if (active) setReady(true)
     })().catch((e) => { if (active) setAccountError(e instanceof Error ? e.message : 'تعذّرت مزامنة بيانات الحساب.') })
@@ -136,8 +138,11 @@ export default function AuthGate() {
 
   const saveCloudData = useCallback(async (data: AppData) => {
     if (!supabase || !user) throw new Error('جلسة الحساب غير متاحة.')
-    const { error } = await supabase.from('user_app_data').upsert({ user_id: user.id, data, updated_at: data.updatedAt || new Date().toISOString() }, { onConflict: 'user_id' })
-    if (error) throw error
+    cloudSaveQueue.current = cloudSaveQueue.current.catch(() => undefined).then(async () => {
+      const { error } = await supabase!.from('user_app_data').upsert({ user_id: user.id, data, updated_at: data.updatedAt || new Date().toISOString() }, { onConflict: 'user_id' })
+      if (error) throw error
+    })
+    return cloudSaveQueue.current
   }, [user?.id])
 
   const signOut = useCallback(async () => {
